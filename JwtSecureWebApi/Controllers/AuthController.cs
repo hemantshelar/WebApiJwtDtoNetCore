@@ -34,6 +34,7 @@ namespace JwtSecureWebApi.Controllers
 			//add claims
 			var claims = new List<Claim>();
 			claims.Add(new Claim(ClaimTypes.Role,"Administrator"));
+			claims.Add(new Claim(ClaimTypes.DateOfBirth, "1981-6-5"));
 			
 			//create token
 			var token = new JwtSecurityToken(

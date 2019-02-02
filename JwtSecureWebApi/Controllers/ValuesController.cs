@@ -10,6 +10,7 @@ namespace JwtSecureWebApi.Controllers
 	[Route("api/[controller]")]
 	[ApiController]
 	[Authorize(Roles = "Administrator")]
+	[Authorize(Policy = "Atleast21Years")]
 	public class ValuesController : ControllerBase
 	{
 		// GET api/values

@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using JwtSecureWebApi.Requirements;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -28,6 +30,14 @@ namespace JwtSecureWebApi
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
+			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+			services.AddAuthorization(options => 
+			{
+				options
+				.AddPolicy("Atleast21Years", 
+				apb => apb.Requirements.Add(new MinimumAgeRequirement(21)));
+			});
+
 			SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Constants.SecurityKey));
 			services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 				.AddJwtBearer(options => 
@@ -42,12 +52,15 @@ namespace JwtSecureWebApi
 						IssuerSigningKey = key
 					};
 				});
-			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+			
+			services.AddSingleton<IAuthorizationHandler, MinimumAgeHandler>();
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 		{
+			
+
 			if (env.IsDevelopment())
 			{
 				app.UseDeveloperExceptionPage();
